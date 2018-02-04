@@ -16,11 +16,11 @@ public class Class {
     private String name;
     private String comment;
 
-    Class(Instructor tempInstructor, ExerciseType exerciseType, String name, Date date, String comment) {
+    Class(int id, Instructor tempInstructor, ExerciseType exerciseType, String name, Date date) {
+        this.id=id;
         this.inctructor = tempInstructor;
         this.exerciseType = exerciseType;
         this.name=name;
-        this.comment=comment;
         this.dateAndTime=date;
     }
 
@@ -78,6 +78,14 @@ public class Class {
 
     public void setExerciseType(ExerciseType exerciseType) {
         this.exerciseType = exerciseType;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

@@ -5,8 +5,8 @@ import java.sql.Date;
 public class GroupClass extends Class{
     private int spacesAvailable;
 
-    public GroupClass(Instructor tempInstructor, ExerciseType exerciseType, String name, Date date, String comment) {
-        super(tempInstructor, exerciseType, name, date, comment);
+    public GroupClass(int id, Instructor tempInstructor, ExerciseType exerciseType, String name, Date date) {
+        super(id, tempInstructor, exerciseType, name, date);
     }
 
     public int getSpacesAvailable() {

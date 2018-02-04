@@ -69,15 +69,15 @@ public class GuiFrame {
     private JLabel träningsHistorik = new JLabel("Träningshistorik");
     List<Class> classes = new ArrayList<>();
     private JLabel selectClass = new JLabel("Välj ett pass för att se kommentar");
-    private JButton läsMer = new JButton("Mer information");
-    private JButton saveComment = new JButton("Spara ny kommentar");
+    private JButton edit = new JButton("LÄGG TILL ANTECKNING");
+    private JButton saveComment = new JButton("SPARA");
     JList list3classes;
     private Class tempClass;
     private JTextField commentField = new JTextField(150);
 
-    
     // COMMENTS
     List<PTComment> comments = new ArrayList<>();
+
     public GuiFrame(DatabaseConnection dc) {
         this.dc = dc;
         frame.setTitle("Personal Trainer Application");
@@ -89,7 +89,6 @@ public class GuiFrame {
         list1instructors.addListSelectionListener(a);
         scroll = new JScrollPane(list1instructors);
         frame.add(panelLogIn);
-
 
         panelLogIn.add(name);
         panelLogIn.add(scroll);
@@ -120,8 +119,6 @@ public class GuiFrame {
         panelChooseMemberCenter.add(scroll, BorderLayout.WEST);
         panelChooseMemberCenter.add(trainingHistory, BorderLayout.EAST);
 
-
-
         list2members.addListSelectionListener(a);
         trainingHistory.addActionListener(a);
 
@@ -132,35 +129,41 @@ public class GuiFrame {
         List<String> classInfoList = this.makeInfoList(classes);
         list3classes = new JList(classInfoList.toArray());
         scroll = new JScrollPane(list3classes);
-        panelClasses.setLayout(new GridLayout(4,1));
+        panelClasses.setLayout(new GridLayout(4, 1));
         panelClasses.add(selectClass);
         panelClasses.add(scroll);
 
-        panelClassesSouth.setLayout(new GridLayout(2,1));
-        panelClassesSouthEast.setLayout(new GridLayout(1,2));
+        panelClassesSouth.setLayout(new GridLayout(2, 1));
+        panelClassesSouthEast.setLayout(new GridLayout(1, 2));
         panelClasses.add(commentField);
         panelClasses.add(panelClassesSouthEast);
-        panelClassesSouthEast.add(läsMer);
+        panelClassesSouthEast.add(edit);
         panelClassesSouthEast.add(saveComment);
 
         list3classes.addListSelectionListener(a);
 
     }
-    
-    public void showComment(){
-        comments = dc.getComments(tempMember);
-                int index = 0;
-                int count = 0;
-        for(Class c : classes){
-            if(c.getId()==tempClass.getId()){
-                index = count;
-            }
-            count++;
-        }
 
-        commentField.setText(comments.get(index).getComment());
+    public void showComment() {
+        for (Class c : classes) {
+            if (c.getId() == tempClass.getId()) {
+                commentField.setText(c.getComment());
+            }
+        }
+        edit.addActionListener(a);
         frame.revalidate();
         frame.repaint();
+    }
+
+    public void makeChangeableComment() {
+        String in = commentField.getText();
+        if (!(in.equalsIgnoreCase("Ingen anteckning."))) {
+            edit.setForeground(Color.black);
+            edit.setText("ÄNDRA");
+        } else {
+            edit.setForeground(Color.red);
+            edit.setText("LÄGG TILL ANTECKNING");
+        }
     }
 
     class ActionHandler implements ActionListener, ListSelectionListener {
@@ -211,7 +214,21 @@ public class GuiFrame {
                     frame.revalidate();
                     frame.repaint();
                 }
+            } else if (e.getSource() == edit) {
+                if(!(commentField.getText().equalsIgnoreCase("Ingen anteckning."))){
+                    commentField.setForeground(Color.BLUE);
+                } else{
+                commentField.setText("Skriv kommentar här...");
+                commentField.setForeground(Color.BLUE);
+                }
+                
+                saveComment.addActionListener(a);
+            } else if (e.getSource() == saveComment) {
+                commentField.setForeground(Color.black);
+                dc.saveNewComment(tempClass.getId(), tempMember.getId(), tempInstructor.getId(), commentField.getText());
+                saveComment.removeActionListener(a);
             }
+
         }
 
         @Override
@@ -231,8 +248,9 @@ public class GuiFrame {
                     int index = list3classes.getSelectedIndex();
                     tempClass = classes.get(index);
                     showComment();
+                    makeChangeableComment();
                 }
-            } 
+            }
         }
     }
 
