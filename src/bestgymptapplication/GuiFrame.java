@@ -4,14 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,7 +16,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.event.ListSelectionEvent;
@@ -33,11 +26,11 @@ public class GuiFrame {
     private DatabaseConnection dc;
 
     // LOGGA IN -------------------------------
-    JFrame frame = new JFrame();
-    private ActionHandler a = new ActionHandler();
+    protected JFrame frame = new JFrame();
+    private ActionHandler ah = new ActionHandler(this);
+    
     private Properties p = new Properties();
-    private JPanel panel;
-    private JPanel panelLogIn = new JPanel();
+    protected JPanel panelLogIn = new JPanel();
     private JPanel panelLogInCenter = new JPanel();
     private JPanel panelLogInOne = new JPanel();
     private JPanel panelLogInTwo = new JPanel();
@@ -45,47 +38,46 @@ public class GuiFrame {
     private JLabel name = new JLabel("NAMN              ", SwingConstants.RIGHT);
     private JLabel password = new JLabel("LÖSENORD    ", SwingConstants.RIGHT);
     private String ptName;
-    List<Instructor> instructors = new ArrayList<>();
-    private JList list1instructors;
-    private JPasswordField passwordEntry = new JPasswordField(20);
-    private JButton logIn = new JButton("Logga in");
-    Instructor tempInstructor;
+    protected List<Instructor> instructors = new ArrayList<>();
+    protected JList list1instructors;
+    protected JPasswordField passwordEntry = new JPasswordField(20);
+    protected JButton logIn = new JButton("Logga in");
+    protected Instructor tempInstructor;
 
     private JScrollPane scroll;
 
     // VÄLJA MEDLEM -----------------------------
-    private JPanel panelChooseMember = new JPanel();
+    protected JPanel panelChooseMember = new JPanel();
     private JLabel welcome = new JLabel();
     private JPanel panelChooseMemberCenter = new JPanel();
-    List<Member> members = new ArrayList<>();
-    Member chosenMember;
-    JList list2members;
-    Member tempMember;
-    JButton trainingHistory = new JButton("Se träningshistoria");
-    JButton kommentar = new JButton("Anteckningar");
-    JButton newComment = new JButton("Ny anteckning");
-    JPanel panelChooseMemberSouth = new JPanel();
+    protected List<Member> members = new ArrayList<>();
+    private Member chosenMember;
+    protected JList list2members;
+    protected Member tempMember;
+    protected JButton trainingHistory = new JButton("Se träningshistoria");
+    private JButton kommentar = new JButton("Anteckningar");
+    private JButton newComment = new JButton("Ny anteckning");
+    private JPanel panelChooseMemberSouth = new JPanel();
     private JLabel chooseMember = new JLabel("Välj en medlem", SwingConstants.CENTER);
 
     // ATTENDADE PASS ------------------------------
-    private JPanel panelClasses = new JPanel();
+    protected JPanel panelClasses = new JPanel();
     private JPanel panelClassesSouth = new JPanel();
     private JPanel panelClassesSouthEast = new JPanel();
 
     private JLabel träningsHistorik = new JLabel("Träningshistorik");
-    List<Class> classes = new ArrayList<>();
+    protected List<Class> classes = new ArrayList<>();
     private JLabel selectClass = new JLabel("Välj ett pass för att se kommentar");
-    private JButton edit = new JButton("LÄGG TILL ANTECKNING");
-    private JButton saveComment = new JButton("SPARA");
-    JList list3classes;
-    private Class tempClass;
-    private JTextField commentField = new JTextField(350);
-    List<String> classInfoList;
-    private JButton back = new JButton("TILLBAKA");
-    JPanel panelClassesNorth = new JPanel(); 
+    protected JButton edit = new JButton("LÄGG TILL ANTECKNING");
+    protected JButton saveComment = new JButton("SPARA");
+    protected JList list3classes;
+    protected Class tempClass;
+    protected JTextField commentField = new JTextField(350);
+    private List<String> classInfoList;
+    private JPanel panelClassesNorth = new JPanel(); 
 
     // COMMENTS
-    List<PTComment> comments = new ArrayList<>();
+    private List<PTComment> comments = new ArrayList<>();
 
     public GuiFrame(DatabaseConnection dc) {
         this.dc = dc;
@@ -95,7 +87,7 @@ public class GuiFrame {
 
         list1instructors = new JList(ptNameList.toArray());
         list1instructors.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list1instructors.addListSelectionListener(a);
+        list1instructors.addListSelectionListener(ah);
         scroll = new JScrollPane(list1instructors);
         frame.add(panelLogIn);
 
@@ -116,8 +108,8 @@ public class GuiFrame {
         panelLogInTwo.add(passwordEntry);
         panelLogInCenter.add(logIn);
 
-        passwordEntry.addActionListener(a);
-        logIn.addActionListener(a);
+        passwordEntry.addActionListener(ah);
+        logIn.addActionListener(ah);
 
         frame.add(panelLogIn);
         frame.setVisible(true);
@@ -144,8 +136,8 @@ public class GuiFrame {
         panelChooseMemberCenter.add(scroll, BorderLayout.CENTER);
         panelChooseMemberCenter.add(trainingHistory, BorderLayout.SOUTH);
 
-        list2members.addListSelectionListener(a);
-        trainingHistory.addActionListener(a);
+        list2members.addListSelectionListener(ah);
+        trainingHistory.addActionListener(ah);
 
     }
 
@@ -158,7 +150,6 @@ public class GuiFrame {
         panelClasses.add(panelClassesNorth);
         panelClasses.add(scroll);
         panelClassesNorth.add(selectClass);
-        panelClassesNorth.add(back);
 
         panelClassesSouth.setLayout(new GridLayout(1, 2));
         panelClassesSouthEast.setLayout(new GridLayout(1, 2));
@@ -168,18 +159,14 @@ public class GuiFrame {
         panelClassesSouthEast.add(edit);
         panelClassesSouthEast.add(saveComment);
 
-        list3classes.addListSelectionListener(a);
-        back.addActionListener(a);
-
+        list3classes.addListSelectionListener(ah);
     }
 
     public void showComment() {
-        for (Class c : classes) {
-            if (c.getId() == tempClass.getId()) {
-                commentField.setText(c.getDateAndTime() + "\n " + c.getComment());
-            }
-        }
-        edit.addActionListener(a);
+        classes.stream().filter((c) -> (c.getId() == tempClass.getId())).forEachOrdered((c) -> {
+            commentField.setText(c.getComment());
+        });
+        edit.addActionListener(ah);
         frame.revalidate();
         frame.repaint();
     }
@@ -194,130 +181,30 @@ public class GuiFrame {
             edit.setText("LÄGG TILL ANTECKNING");
         }
     }
-
-    class ActionHandler implements ActionListener, ListSelectionListener {
-
-        String passwordIn;
-        PreparedStatement pStmt;
-        ResultSet rs;
-
-        public void makeConnection() {
-            try (Connection con = DriverManager.getConnection(
-                    p.getProperty("ConnectionString"),
-                    p.getProperty("username"),
-                    p.getProperty("password"))) {
-
-            } catch (SQLException ex) {
-                Logger.getLogger(GuiFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == logIn) {
-                passwordIn = new String(passwordEntry.getPassword());
-                if (passwordIn == null) {
-                    JOptionPane.showMessageDialog(frame,"Du måste skriva in ett lösenord.");
-                } else if (tempInstructor == null) {
-                    JOptionPane.showMessageDialog(frame,"Du måste välja en användare.");
-                } else {
-                    if (tempInstructor.getPassword().equals(passwordIn)) {
-                        setChooseMember();
-                        frame.remove(panelLogIn);
-                        frame.add(panelChooseMember);
-                        frame.revalidate();
-                        frame.repaint();
-                        
-                    } else {
-                        JOptionPane.showMessageDialog(frame,"Felaktigt lösenord.");
-                    }
-                }
-
-            } else if (e.getSource() == trainingHistory) {
-                if (tempMember == null) {
-                    JOptionPane.showMessageDialog(frame, "Du måste välja en medlem");
-                } else {
-                    frame.remove(panelChooseMember);
-                    setTrainingHistory(tempMember);
-                    frame.add(panelClasses);
-                    frame.revalidate();
-                    frame.repaint();
-                }
-            } else if (e.getSource() == edit) {
-                commentField.setEditable(true);
-                if (!(commentField.getText().equalsIgnoreCase("Ingen anteckning."))) {
-                    commentField.setForeground(Color.BLUE);
-                } else {
-                    commentField.setText("Skriv kommentar här...");
-                    commentField.setForeground(Color.BLUE);
-                }
-                saveComment.setForeground(Color.red);
-
-                saveComment.addActionListener(a);
-            } else if (e.getSource() == saveComment) {
-                JOptionPane.showMessageDialog(frame, "Kommentaren har sparats.");
-                dc.saveNewComment(tempClass.getId(), tempMember.getId(), tempInstructor.getId(), commentField.getText());
-                saveComment.removeActionListener(a);
-                commentField.setEditable(false);
-                commentField.setForeground(Color.black);
-                saveComment.setForeground(Color.black);
-
-                for (Class ss : classes) {
-                    if (ss == tempClass) {
-                        ss.setComment(commentField.getText());
-                    }
-                }
-                frame.revalidate();
-                frame.repaint();
-            } else if (e.getSource() == back) {
-//                frame.remove(panelClasses);
-//                frame.add(panelChooseMember);
-//                frame.revalidate();
-//                frame.repaint();
-            }
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            if (e.getSource() == list1instructors) {
-                if (e.getValueIsAdjusting() == false) {
-                    int index = list1instructors.getSelectedIndex();
-                    tempInstructor = instructors.get(index);
-                }
-            } else if (e.getSource() == list2members) {
-                if (e.getValueIsAdjusting() == false) {
-                    int index = list2members.getSelectedIndex();
-                    tempMember = members.get(index);
-                }
-            } else if (e.getSource() == list3classes) {
-                if (e.getValueIsAdjusting() == false) {
-                    int index = list3classes.getSelectedIndex();
-                    tempClass = classes.get(index);
-                    showComment();
-                    makeChangeableComment();
-                }
-            }
-        }
-
+    
+    public void saveComment(){
+        dc.saveNewComment(tempClass.getId(), tempMember.getId(), tempInstructor.getId(), commentField.getText());
     }
+
 
     public List<String> makeStringList(List<? extends Person> personList) {
         List<String> nameList = new ArrayList<>();
-        for (Person i : personList) {
+        personList.forEach((i) -> {
             nameList.add(i.getFirstName() + " " + i.getSurName());
-        }
+        });
         return nameList;
     }
 
     public List<String> makeInfoList(List<Class> classList) {
         List<String> stringList = new ArrayList<>();
-        for (Class c : classList) {
-            String temp = c.getDateAndTime() + "    " + c.getName().toUpperCase() + "     "
-                    + c.getInctructor().getFirstName() + " "
-                    + c.getInctructor().getSurName();
-            stringList.add(temp);
+        classList.stream().map((c) -> c.getDateAndTime() + "    " + c.getName().toUpperCase() + "     "
+                + c.getInctructor().getFirstName() + " "
+                + c.getInctructor().getSurName()).map((temp) -> {
+                    stringList.add(temp);
+            return temp;
+        }).forEachOrdered((temp) -> {
             System.out.println(temp);
-        }
+        });
 
         return stringList;
     }
