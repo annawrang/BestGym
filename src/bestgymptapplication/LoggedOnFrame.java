@@ -1,5 +1,0 @@
-package bestgymptapplication;
-
-class LoggedOnFrame {
-    
-}

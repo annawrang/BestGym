@@ -4,7 +4,6 @@ public class BestGymPTApplication{
 
     DatabaseConnection dc;
     GuiFrame gf;
-    LoggedOnFrame lf;
     int stage;
 
     public BestGymPTApplication() {

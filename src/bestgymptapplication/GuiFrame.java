@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -37,8 +39,11 @@ public class GuiFrame {
     private JPanel panel;
     private JPanel panelLogIn = new JPanel();
     private JPanel panelLogInCenter = new JPanel();
-    private JLabel name = new JLabel("Namn");
-    private JLabel password = new JLabel("Lösenord");
+    private JPanel panelLogInOne = new JPanel();
+    private JPanel panelLogInTwo = new JPanel();
+    private JLabel empty = new JLabel("                   ");
+    private JLabel name = new JLabel("NAMN              ", SwingConstants.RIGHT);
+    private JLabel password = new JLabel("LÖSENORD    ", SwingConstants.RIGHT);
     private String ptName;
     List<Instructor> instructors = new ArrayList<>();
     private JList list1instructors;
@@ -56,10 +61,11 @@ public class GuiFrame {
     Member chosenMember;
     JList list2members;
     Member tempMember;
-    JButton trainingHistory = new JButton("Träningshistoria");
+    JButton trainingHistory = new JButton("Se träningshistoria");
     JButton kommentar = new JButton("Anteckningar");
     JButton newComment = new JButton("Ny anteckning");
     JPanel panelChooseMemberSouth = new JPanel();
+    private JLabel chooseMember = new JLabel("Välj en medlem", SwingConstants.CENTER);
 
     // ATTENDADE PASS ------------------------------
     private JPanel panelClasses = new JPanel();
@@ -73,7 +79,10 @@ public class GuiFrame {
     private JButton saveComment = new JButton("SPARA");
     JList list3classes;
     private Class tempClass;
-    private JTextField commentField = new JTextField(150);
+    private JTextField commentField = new JTextField(350);
+    List<String> classInfoList;
+    private JButton back = new JButton("TILLBAKA");
+    JPanel panelClassesNorth = new JPanel(); 
 
     // COMMENTS
     List<PTComment> comments = new ArrayList<>();
@@ -90,12 +99,22 @@ public class GuiFrame {
         scroll = new JScrollPane(list1instructors);
         frame.add(panelLogIn);
 
-        panelLogIn.add(name);
-        panelLogIn.add(scroll);
+        panelLogIn.setLayout(new GridLayout(2,1));
+        panelLogIn.add(panelLogInCenter);
+        panelLogInCenter.setLayout(new GridLayout(4,1));
+                panelLogInCenter.add(empty);
+        panelLogInCenter.add(panelLogInOne);
+        panelLogInOne.setLayout(new GridLayout(1,2));
+        panelLogInCenter.add(panelLogInTwo);
+        panelLogInTwo.setLayout(new GridLayout());
+        
 
-        panelLogIn.add(password);
-        panelLogIn.add(passwordEntry);
-        panelLogIn.add(logIn);
+        panelLogInOne.add(name);
+        panelLogInOne.add(scroll);
+
+        panelLogInTwo.add(password);
+        panelLogInTwo.add(passwordEntry);
+        panelLogInCenter.add(logIn);
 
         passwordEntry.addActionListener(a);
         logIn.addActionListener(a);
@@ -104,20 +123,26 @@ public class GuiFrame {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setLocation(1000, 400);
-        frame.setSize(600, 500);
+        frame.setSize(500, 400);
+        frame.getRootPane().setDefaultButton(logIn);
     }
 
     public void setChooseMember() {
         members = dc.getMembers();
         List<String> memberNameList = makeStringList(members);
+        
+        Font f = new Font("Helvetica", Font.BOLD, 20);
+        
         panelChooseMember.setLayout(new BorderLayout());
         panelChooseMemberCenter.setLayout(new BorderLayout());
 
         panelChooseMember.add(panelChooseMemberCenter, BorderLayout.CENTER);
         list2members = new JList(memberNameList.toArray());
         scroll = new JScrollPane(list2members);
-        panelChooseMemberCenter.add(scroll, BorderLayout.WEST);
-        panelChooseMemberCenter.add(trainingHistory, BorderLayout.EAST);
+        chooseMember.setFont(f);
+        panelChooseMemberCenter.add(chooseMember, BorderLayout.NORTH);
+        panelChooseMemberCenter.add(scroll, BorderLayout.CENTER);
+        panelChooseMemberCenter.add(trainingHistory, BorderLayout.SOUTH);
 
         list2members.addListSelectionListener(a);
         trainingHistory.addActionListener(a);
@@ -126,28 +151,32 @@ public class GuiFrame {
 
     public void setTrainingHistory(Member member) {
         classes = dc.getClasses(member);
-        List<String> classInfoList = this.makeInfoList(classes);
+        classInfoList = this.makeInfoList(classes);
         list3classes = new JList(classInfoList.toArray());
         scroll = new JScrollPane(list3classes);
         panelClasses.setLayout(new GridLayout(4, 1));
-        panelClasses.add(selectClass);
+        panelClasses.add(panelClassesNorth);
         panelClasses.add(scroll);
+        panelClassesNorth.add(selectClass);
+        panelClassesNorth.add(back);
 
-        panelClassesSouth.setLayout(new GridLayout(2, 1));
+        panelClassesSouth.setLayout(new GridLayout(1, 2));
         panelClassesSouthEast.setLayout(new GridLayout(1, 2));
         panelClasses.add(commentField);
+        commentField.setEditable(false);
         panelClasses.add(panelClassesSouthEast);
         panelClassesSouthEast.add(edit);
         panelClassesSouthEast.add(saveComment);
 
         list3classes.addListSelectionListener(a);
+        back.addActionListener(a);
 
     }
 
     public void showComment() {
         for (Class c : classes) {
             if (c.getId() == tempClass.getId()) {
-                commentField.setText(c.getComment());
+                commentField.setText(c.getDateAndTime() + "\n " + c.getComment());
             }
         }
         edit.addActionListener(a);
@@ -209,26 +238,56 @@ public class GuiFrame {
                     System.out.println("Du måste välja en medlem");
                 } else {
                     frame.remove(panelChooseMember);
+//
+//                    panelClasses.remove(panelClassesNorth);
+//                    panelClasses.remove(scroll);
+//                    panelClasses.remove(commentField);
+//                    panelClasses.remove(panelClassesSouthEast);
+//                            
+//                    
+//
+//                    panelClasses.add(panelClassesNorth);
+//                    panelClasses.add(scroll);
+//                    panelClasses.add(commentField);
+//                    panelClasses.add(panelClassesSouthEast);
+
+
                     setTrainingHistory(tempMember);
                     frame.add(panelClasses);
                     frame.revalidate();
                     frame.repaint();
                 }
             } else if (e.getSource() == edit) {
-                if(!(commentField.getText().equalsIgnoreCase("Ingen anteckning."))){
+                commentField.setEditable(true);
+                if (!(commentField.getText().equalsIgnoreCase("Ingen anteckning."))) {
                     commentField.setForeground(Color.BLUE);
-                } else{
-                commentField.setText("Skriv kommentar här...");
-                commentField.setForeground(Color.BLUE);
+                } else {
+                    commentField.setText("Skriv kommentar här...");
+                    commentField.setForeground(Color.BLUE);
                 }
-                
+                saveComment.setForeground(Color.red);
+
                 saveComment.addActionListener(a);
             } else if (e.getSource() == saveComment) {
-                commentField.setForeground(Color.black);
                 dc.saveNewComment(tempClass.getId(), tempMember.getId(), tempInstructor.getId(), commentField.getText());
                 saveComment.removeActionListener(a);
-            }
+                commentField.setEditable(false);
+                commentField.setForeground(Color.black);
+                saveComment.setForeground(Color.black);
 
+                for (Class ss : classes) {
+                    if (ss == tempClass) {
+                        ss.setComment(commentField.getText());
+                    }
+                }
+                frame.revalidate();
+                frame.repaint();
+            } else if (e.getSource() == back) {
+//                frame.remove(panelClasses);
+//                frame.add(panelChooseMember);
+//                frame.revalidate();
+//                frame.repaint();
+            }
         }
 
         @Override
@@ -252,6 +311,7 @@ public class GuiFrame {
                 }
             }
         }
+
     }
 
     public List<String> makeStringList(List<? extends Person> personList) {
