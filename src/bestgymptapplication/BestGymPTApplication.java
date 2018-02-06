@@ -1,5 +1,7 @@
 package bestgymptapplication;
 
+import javax.swing.JOptionPane;
+
 public class BestGymPTApplication{
 
     DatabaseConnection dc;

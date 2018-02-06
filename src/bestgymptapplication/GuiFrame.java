@@ -217,9 +217,9 @@ public class GuiFrame {
             if (e.getSource() == logIn) {
                 passwordIn = new String(passwordEntry.getPassword());
                 if (passwordIn == null) {
-                    System.out.println("Du måste skriva in ett lösenord.");
+                    JOptionPane.showMessageDialog(frame,"Du måste skriva in ett lösenord.");
                 } else if (tempInstructor == null) {
-                    System.out.println("Du måste välja en användare.");
+                    JOptionPane.showMessageDialog(frame,"Du måste välja en användare.");
                 } else {
                     if (tempInstructor.getPassword().equals(passwordIn)) {
                         setChooseMember();
@@ -227,31 +227,17 @@ public class GuiFrame {
                         frame.add(panelChooseMember);
                         frame.revalidate();
                         frame.repaint();
-                        System.out.println("Inloggad!");
+                        
                     } else {
-                        System.out.println("Fel lösenord.");
+                        JOptionPane.showMessageDialog(frame,"Felaktigt lösenord.");
                     }
                 }
 
             } else if (e.getSource() == trainingHistory) {
                 if (tempMember == null) {
-                    System.out.println("Du måste välja en medlem");
+                    JOptionPane.showMessageDialog(frame, "Du måste välja en medlem");
                 } else {
                     frame.remove(panelChooseMember);
-//
-//                    panelClasses.remove(panelClassesNorth);
-//                    panelClasses.remove(scroll);
-//                    panelClasses.remove(commentField);
-//                    panelClasses.remove(panelClassesSouthEast);
-//                            
-//                    
-//
-//                    panelClasses.add(panelClassesNorth);
-//                    panelClasses.add(scroll);
-//                    panelClasses.add(commentField);
-//                    panelClasses.add(panelClassesSouthEast);
-
-
                     setTrainingHistory(tempMember);
                     frame.add(panelClasses);
                     frame.revalidate();
@@ -269,6 +255,7 @@ public class GuiFrame {
 
                 saveComment.addActionListener(a);
             } else if (e.getSource() == saveComment) {
+                JOptionPane.showMessageDialog(frame, "Kommentaren har sparats.");
                 dc.saveNewComment(tempClass.getId(), tempMember.getId(), tempInstructor.getId(), commentField.getText());
                 saveComment.removeActionListener(a);
                 commentField.setEditable(false);
