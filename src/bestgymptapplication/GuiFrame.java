@@ -202,8 +202,10 @@ public class GuiFrame {
                 + c.getInctructor().getSurName()).map((temp) -> {
                     stringList.add(temp);
             return temp;
+            
+               
         }).forEachOrdered((temp) -> {
-            System.out.println(temp);
+//            System.out.println(temp);
         });
 
         return stringList;

@@ -134,9 +134,9 @@ public class DatabaseConnection {
                     }
                 }
             }
-            for (Class cc : classList) {
-                System.out.println(cc.getId() + " " + cc.getComment());
-            }
+//            for (Class cc : classList) {
+//                System.out.println(cc.getId() + " " + cc.getComment());
+//            }
 
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
