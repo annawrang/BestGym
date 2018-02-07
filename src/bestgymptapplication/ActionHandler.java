@@ -59,11 +59,14 @@ public class ActionHandler implements ActionListener, ListSelectionListener {
             }
         } else if (e.getSource() == gf.edit) {
             gf.commentField.setEditable(true);
-            if (!(gf.commentField.getText().equalsIgnoreCase("Ingen anteckning."))) {
+            if (!(gf.commentField.getText().equalsIgnoreCase("Ingen anteckning.") ||
+                    gf.commentField.getText().equalsIgnoreCase(""))) {
                 gf.commentField.setForeground(Color.BLUE);
+                gf.edit.setForeground(Color.black);
             } else {
                 gf.commentField.setText("Skriv kommentar här...");
                 gf.commentField.setForeground(Color.BLUE);
+                gf.edit.setForeground(Color.black);
             }
             gf.saveComment.setForeground(Color.red);
 

@@ -173,7 +173,7 @@ public class GuiFrame {
 
     public void makeChangeableComment() {
         String in = commentField.getText();
-        if (!(in.equalsIgnoreCase("Ingen anteckning."))) {
+        if (!(in.equalsIgnoreCase("Ingen anteckning.") || in.equalsIgnoreCase(""))) {
             edit.setForeground(Color.black);
             edit.setText("ÄNDRA");
         } else {
