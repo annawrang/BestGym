@@ -6,7 +6,6 @@ public class BestGymPTApplication{
 
     DatabaseConnection dc;
     GuiFrame gf;
-//    int stage;
 
     public BestGymPTApplication() {
         dc = new DatabaseConnection();
